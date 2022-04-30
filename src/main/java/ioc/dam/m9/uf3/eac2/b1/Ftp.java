@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,33 +35,35 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class Ftp {
 
-	public static final String IP = "localhost";
+	public static final String IP = "127.0.0.1";
 	public static final int PORT = 21;
-	public static final String USUARI = "tomas";
+	public static final String USUARI = "isabel";
 	public static final String PASSWORD = "1234";
 	
 	public static void main(String args[]) {
 		
-		FTPClient clientFtp = new FTPClient();
-	
+		FTPClient clientFtp = new FTPClient(); // nueva instancia ftpclient para inicializar la conexión
+		
 		try {
 			// Connecta amb el servidor FTP i inicia sessió
 			System.out.println("Connectant i iniciant sessió . . .");
-			
                         //IMPLEMENTA
-			
 			/*
 			 *  En el mode passiu sempre és el client qui obra les connexions
 			 */
-
             clientFtp.connect(IP, PORT);  // CONEXIÓN APERTURA
-            clientFtp.login(IP, PASSWORD); // PARÁMETROS A AUTENTICAR
-            
-                        
+            clientFtp.login(USUARI, PASSWORD); // PARÁMETROS A AUTENTICAR
+            clientFtp.enterLocalPassiveMode();     
+            clientFtp.setFileType(FTPClient.BINARY_FILE_TYPE);
 			//IMPLEMENTA
-			
-                        
-                        menu(clientFtp);
+            
+           /* int reply = clientFtp.getReplyCode();
+            
+            System.out.println("Resposta rebuda de connexió FTP:" + reply);
+                     */
+            
+            // DISPARO DEL MENÚ PARA VERIFICAR FICHEROS 
+            menu(clientFtp);
 
 
 		} catch (IOException ioe) {
@@ -119,6 +123,16 @@ public class Ftp {
         
             
             //IMPLEMENTAR
+        	System.out.println("Evento");
+        	System.out.println(clientFtp);
+        	String directorio = "/";
+        	
+        	FTPFile [] archivosFTP = clientFtp.listFiles(); // ARRAY DE ARCHIVOS DE LA INSTANCIA FTP
+        	
+        	for  ( FTPFile archivo : archivosFTP ) {
+        		System.out.println(archivo);
+        	}
+        	
             
         } 
         
