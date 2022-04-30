@@ -40,7 +40,7 @@ public class Ftp {
 	
 	public static void main(String args[]) {
 		
-		FTPClient clientFtp = null;
+		FTPClient clientFtp = new FTPClient();
 	
 		try {
 			// Connecta amb el servidor FTP i inicia sessió
@@ -51,6 +51,10 @@ public class Ftp {
 			/*
 			 *  En el mode passiu sempre és el client qui obra les connexions
 			 */
+
+            clientFtp.connect(IP, PORT);  // CONEXIÓN APERTURA
+            clientFtp.login(IP, PASSWORD); // PARÁMETROS A AUTENTICAR
+            
                         
 			//IMPLEMENTA
 			
