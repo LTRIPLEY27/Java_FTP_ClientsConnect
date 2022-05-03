@@ -124,15 +124,23 @@ public class Ftp {
             
             //IMPLEMENTAR
         	System.out.println("Evento");
-        	System.out.println(clientFtp);
-        	String directorio = "/";
+        	System.out.println(clientFtp.listNames());
+        	String directorio = "C:\\Users\\isabe\\Documents";
         	
-        	FTPFile [] archivosFTP = clientFtp.listFiles(); // ARRAY DE ARCHIVOS DE LA INSTANCIA FTP
+        	String[] aux = clientFtp.listNames();
+        	FTPFile[] aux1 = clientFtp.listFiles();
+        	//FTPFile[] archivosFTP = clientFtp.listFiles(); // ARRAY DE ARCHIVOS DE LA INSTANCIA FTP
         	
-        	for  ( FTPFile archivo : archivosFTP ) {
-        		System.out.println(archivo);
+        	for  ( String x : aux ) {
+        		System.out.println(x);
         	}
         	
+        	for  ( String x : aux ) {
+        		System.out.println(x);
+        	}
+        	//System.out.println(archivosFTP[1]);
+        	clientFtp.enterLocalActiveMode();
+    		menu(clientFtp);
             
         } 
         
