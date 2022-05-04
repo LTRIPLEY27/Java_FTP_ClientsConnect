@@ -37,7 +37,7 @@ public class Ftp {
 
 	public static final String IP = "127.0.0.1";
 	public static final int PORT = 21;
-	public static final String USUARI = "isabel";
+	public static final String USUARI = "isabel";//LA VARIABLE SE PUEDE MODIFICAR SEGÚN EL USUARIO QUE HALLAMOS CONFIGURADO
 	public static final String PASSWORD = "1234";
 	
 	public static void main(String args[]) {
@@ -56,15 +56,8 @@ public class Ftp {
             clientFtp.enterLocalPassiveMode();     
             clientFtp.setFileType(FTPClient.BINARY_FILE_TYPE);
 			//IMPLEMENTA
-            
-           /* int reply = clientFtp.getReplyCode();
-            
-            System.out.println("Resposta rebuda de connexió FTP:" + reply);
-                     */
-            
             // DISPARO DEL MENÚ PARA VERIFICAR FICHEROS 
             menu(clientFtp);
-
 
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -124,19 +117,19 @@ public class Ftp {
             
             //IMPLEMENTAR
         	System.out.println("Evento");
-        	System.out.println(clientFtp.listNames());
+//        	System.out.println(clientFtp.listNames());
         	String directorio = "C:\\Users\\isabe\\Documents";
         	
-        	String[] aux = clientFtp.listNames();
-        	FTPFile[] aux1 = clientFtp.listFiles();
+        	//String[] aux = clientFtp.listNames();
+        	FTPFile[] aux1 = clientFtp.listFiles();//"/C:/Users/isabe/Documents"
         	//FTPFile[] archivosFTP = clientFtp.listFiles(); // ARRAY DE ARCHIVOS DE LA INSTANCIA FTP
         	
-        	for  ( String x : aux ) {
-        		System.out.println(x);
-        	}
+        	//for  ( String x : aux ) {
+        	//	System.out.println(x);
+        	//}
         	
-        	for  ( String x : aux ) {
-        		System.out.println(x);
+        	for  ( FTPFile x1 : aux1 ) {
+        		System.out.println(x1.getName());
         	}
         	//System.out.println(archivosFTP[1]);
         	clientFtp.enterLocalActiveMode();
