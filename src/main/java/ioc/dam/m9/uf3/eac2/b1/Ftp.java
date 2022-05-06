@@ -155,27 +155,72 @@ public class Ftp {
 			// Descarrega un fitxer del servidor FTP
 			
         	Boolean isOk = false;
-        	String pathFile = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";//DIRECTORIO DONDE SE ALOJARÁ EL NUEVO ARCHIVO
+        	String pathFile = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C\\NUEVO.txt";//DIRECTORIO DONDE SE ALOJARÁ EL NUEVO ARCHIVO
         	OutputStream output = null;
         	InputStream imput = null;
-        	System.out.println("Indique el archivo a descargar?");
-        	String remote = ask.next();
-        	System.out.println("Indique el nombre del archivo");
-        	String file = ask.next();
+        	//System.out.println("Indique el archivo a descargar?");
+        	//String remote = ask.next();
+        	//String remote = "C:\\Users\\isabe\\Documents\\texto.txt";
+        	//System.out.println("Indique el nombre del archivo");
+        	//String file = ask.next();
+        	
+        	BufferedInputStream insert = null;
+        	System.out.println("Indique el archivo a transferir?");
+        	
+        	while(!isOk) {
+        		String remote = "C:\\Users\\isabe\\Documents\\texto.txt";
+        		try {
+        			insert = new BufferedInputStream(new FileInputStream(remote));
+        			isOk = true;
+        		}catch(Exception e) {
+        			System.out.println(e.getMessage());
+            		System.out.println("Verifica el directorio");
+        		}
+        	}
+        	
+        	clientFtp.enterLocalPassiveMode();
+        	clientFtp.storeFile("nuevoArchivo.txt", insert);
+        	System.out.println("OKKKKKKKKKK");
         	
         	try {
-        		File down = new File(pathFile + file);
+        		File descarga = new File(pathFile);
+            	BufferedOutputStream salida = new BufferedOutputStream(new FileOutputStream(descarga));
+            	boolean descar = clientFtp.retrieveFile("nuevoArchivo.txt", salida);
+            	if(descar) {
+            		System.out.println("OKKKKKKKKKK 2222222222222");
+            	}
+        	}catch(Exception e) {
+    			System.out.println(e.getMessage());
+        		System.out.println("Verifica el directorio");
+    		}
+        	
+        	/// SUGUE SIN DAR RESPUESTA
+        	
+        	/*try {
+        		//File down = new File(pathFile + file);
+        		File down = new File(remote);
         		
-        		output = new BufferedOutputStream(new FileOutputStream(down));
+        		InputStream in = new FileInputStream(down);
+        		Boolean done = clientFtp.storeUniqueFile(in);
+        		in.close();
+        		if(done) {
+        			System.out.println("OKKKKKKKKKK");
+        		}
+        	} catch(Exception e) {
+        		System.out.println(e.getMessage());
+        		System.out.println("Verifica el directorio");
+        	}/*
+        		/////////
+        		//output = new BufferedOutputStream(new FileOutputStream(down));
         		  
-            	imput = clientFtp.retrieveFileStream(remote);
+            	//imput = clientFtp.retrieveFileStream(remote);
             	
-            	byte[] byt = new byte [4096];
+            	/*byte[] byt = new byte [4096];
             	int x = -1;
-            	while((x = imput.read(byt)) != -1) {
-            		output.write(byt, 0, x);
-            		System.out.println("Descargando");
-            	} 	  	
+            	//while((x = imput.read(byt)) != -1) {
+            		//output.write(byt, 0, x);
+            		//System.out.println("Descargando");
+            	} 	/* 
         	} catch(Exception e) {
         		System.out.println("Verifica el directorio");
         	}
@@ -185,21 +230,37 @@ public class Ftp {
         		System.out.println("Verifica el direcrotio");
         	}*/
         	
-        	clientFtp.enterLocalPassiveMode();
+        	/*clientFtp.enterLocalPassiveMode();
         	isOk = clientFtp.retrieveFile("nuevo", output);
         	if(isOk) {
         		System.out.println("Verifica el direcrotio, ya he descargado");
-        	}
-
+        	}*/
+        	
+        	insert.close();
+     
         	menu(clientFtp);
   }
         
         
          public static void esborrarFitxerFTP(FTPClient ftpClient) throws IOException{
         
-        
-             //IMPLEMENTACIÓ
-             
+        	 String archivo = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";
+        	 boolean isOk = false;
+        	// BufferedInputStream elimina = null;
+        	 System.out.println("Indique el nombre del archivo");
+         	 String file = ask.next();
+        	 try {
+        		 isOk = ftpClient.deleteFile(archivo + file);
+            	 if(isOk) {
+            		 System.out.println("Hasta la vista baby");
+            	 } 
+        	 } catch(Exception e) {
+         		System.out.println(e.getMessage());
+         		System.out.println("Verifica el directorio");
+         	}
+        	 
+        	 
+        	 menu(ftpClient);
     }
     
         
