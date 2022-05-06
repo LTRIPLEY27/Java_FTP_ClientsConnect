@@ -8,11 +8,15 @@ package ioc.dam.m9.uf3.eac2.b1;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,22 +41,42 @@ public class Ftp {
 
 	public static final String IP = "127.0.0.1";
 	public static final int PORT = 21;
-	public static final String USUARI = "isabel";//LA VARIABLE SE PUEDE MODIFICAR SEGÚN EL USUARIO QUE HALLAMOS CONFIGURADO
-	public static final String PASSWORD = "1234";
+	public static boolean isConnected = false;
+	public static String user;
+	public static String pass;
+	public static Scanner ask = new Scanner(System.in);
 	
 	public static void main(String args[]) {
-		
 		FTPClient clientFtp = new FTPClient(); // nueva instancia ftpclient para inicializar la conexión
 		
 		try {
-			// Connecta amb el servidor FTP i inicia sessió
-			System.out.println("Connectant i iniciant sessió . . .");
-                        //IMPLEMENTA
 			/*
 			 *  En el mode passiu sempre és el client qui obra les connexions
 			 */
-            clientFtp.connect(IP, PORT);  // CONEXIÓN APERTURA
-            clientFtp.login(USUARI, PASSWORD); // PARÁMETROS A AUTENTICAR
+          
+            do {
+            	 // CONEXIÓN APERTURA   
+                System.out.println("Introdueix usuari");
+        		user = ask.next();
+        		System.out.println("Introdueix password");
+        		pass = ask.next();
+        		
+        		clientFtp.connect(IP, PORT); 
+        		clientFtp.login(user, pass); // PARÁMETROS A AUTENTICAR
+        		int respuesta = clientFtp.getReplyCode();
+        		System.out.println("Resposta rebuda de connexio FTP: " + respuesta);
+        		
+        		if(FTPReply.isPositiveCompletion(respuesta)) {
+        			System.out.println("Ens hem conectat satisfactoriament");
+                    isConnected = true;
+        		} else {
+        			System.out.println("Tenim problemes de connexió!!!");
+                    System.out.println("Probablement tens el password o user incorrecte");
+        		}	
+            }while(!isConnected);
+            
+            clientFtp.changeWorkingDirectory("/");
+            System.out.println("S'ha fet el canvi satisfactoriament");
             clientFtp.enterLocalPassiveMode();     
             clientFtp.setFileType(FTPClient.BINARY_FILE_TYPE);
 			//IMPLEMENTA
@@ -79,7 +103,6 @@ public class Ftp {
 	}
         
         
-        
         public static void menu(FTPClient clientFtp) throws IOException{
         boolean sortir = false;
         Scanner lector = new Scanner(System.in);
@@ -92,47 +115,32 @@ public class Ftp {
             System.out.println("");
         int opcio=lector.nextInt();
         switch (opcio){
-            case 1: 
-                
+            case 1:   
                     mostrarDirectori(clientFtp);                    
             break;
             case 2: 
-                    DescarregarFitxer(clientFtp);
-                    
+                    DescarregarFitxer(clientFtp);       
             break;
             case 3: 
                     esborrarFitxerFTP(clientFtp);
-                break;
-                
+                break;      
             case 4:
-                break;
-                
+                break;        
             default: System.out.println("Opció incorrecta, torneu a entrar el número");
             
         }
         
         }
-        public static void mostrarDirectori(FTPClient clientFtp) throws IOException{
-        
-            
+        public static void mostrarDirectori(FTPClient clientFtp) throws IOException{           
             //IMPLEMENTAR
-        	System.out.println("Evento");
-//        	System.out.println(clientFtp.listNames());
-        	String directorio = "C:\\Users\\isabe\\Documents";
-        	
-        	//String[] aux = clientFtp.listNames();
-        	FTPFile[] aux1 = clientFtp.listFiles();//"/C:/Users/isabe/Documents"
-        	//FTPFile[] archivosFTP = clientFtp.listFiles(); // ARRAY DE ARCHIVOS DE LA INSTANCIA FTP
-        	
-        	//for  ( String x : aux ) {
-        	//	System.out.println(x);
-        	//}
-        	
-        	for  ( FTPFile x1 : aux1 ) {
-        		System.out.println(x1.getName());
+        	System.out.println("Llistant el directorio arrel del servidor . . \n");
+
+        	FTPFile[] files = clientFtp.listFiles();
+        	for  ( FTPFile file : files ) {
+        		System.out.println(file.getName());
         	}
-        	//System.out.println(archivosFTP[1]);
-        	clientFtp.enterLocalActiveMode();
+
+        	clientFtp.enterLocalPassiveMode();;
     		menu(clientFtp);
             
         } 
@@ -146,7 +154,44 @@ public class Ftp {
         
 			// Descarrega un fitxer del servidor FTP
 			
-        
+        	Boolean isOk = false;
+        	String pathFile = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";//DIRECTORIO DONDE SE ALOJARÁ EL NUEVO ARCHIVO
+        	OutputStream output = null;
+        	InputStream imput = null;
+        	System.out.println("Indique el archivo a descargar?");
+        	String remote = ask.next();
+        	System.out.println("Indique el nombre del archivo");
+        	String file = ask.next();
+        	
+        	try {
+        		File down = new File(pathFile + file);
+        		
+        		output = new BufferedOutputStream(new FileOutputStream(down));
+        		  
+            	imput = clientFtp.retrieveFileStream(remote);
+            	
+            	byte[] byt = new byte [4096];
+            	int x = -1;
+            	while((x = imput.read(byt)) != -1) {
+            		output.write(byt, 0, x);
+            		System.out.println("Descargando");
+            	} 	  	
+        	} catch(Exception e) {
+        		System.out.println("Verifica el directorio");
+        	}
+        	/*
+        	boolean resp = clientFtp.completePendingCommand();
+        	if(resp) {
+        		System.out.println("Verifica el direcrotio");
+        	}*/
+        	
+        	clientFtp.enterLocalPassiveMode();
+        	isOk = clientFtp.retrieveFile("nuevo", output);
+        	if(isOk) {
+        		System.out.println("Verifica el direcrotio, ya he descargado");
+        	}
+
+        	menu(clientFtp);
   }
         
         
