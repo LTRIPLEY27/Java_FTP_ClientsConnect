@@ -56,7 +56,7 @@ public class SoftCatalaClient {
   
   public Elements parsejador(String urlS) throws IOException{
       
-      Document doc = Jsoup.connect(urlS).get();
+      		Document doc = Jsoup.connect(urlS).get();
             Element elem = doc.getElementsByClass("col-sm-8 multilingue_list").first();
             Element ul = elem.children().get(0);
             Elements childs = ul.children();

@@ -41,11 +41,23 @@ public class ThreadClient extends Thread {
         String msg;
         SoftCatalaClient soft = new SoftCatalaClient();
         String traduccio;
+        
+        while(( traduccio = in.nextLine()) != null) {
+        	if("exit".equalsIgnoreCase(traduccio)) {
+        		out.println("Exit");
+        		break;
+        	}
+        	
+        	msg = soft.translate(traduccio);
+        	out.println(msg);
+        }
 
         try {
             
             //IMPLEMENTA
-            
+            in.close();
+            out.close();
+            client.close();
             
         } catch (IOException ex) {
             Logger.getLogger(ThreadClient.class.getName()).log(Level.SEVERE, null, ex);
