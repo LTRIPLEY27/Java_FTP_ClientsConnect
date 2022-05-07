@@ -21,6 +21,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.net.finger.FingerClient;
 import org.apache.commons.net.ftp.FTP;  
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -131,6 +132,7 @@ public class Ftp {
         }
         
         }
+        
         public static void mostrarDirectori(FTPClient clientFtp) throws IOException{           
             //IMPLEMENTAR
         	System.out.println("Llistant el directorio arrel del servidor . . \n");
@@ -155,88 +157,44 @@ public class Ftp {
 			// Descarrega un fitxer del servidor FTP
 			
         	Boolean isOk = false;
-        	String pathFile = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C\\NUEVO.txt";//DIRECTORIO DONDE SE ALOJARÁ EL NUEVO ARCHIVO
-        	OutputStream output = null;
+        	String pathFile = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";//DIRECTORIO DONDE SE ALOJARÁ EL NUEVO ARCHIVO
+        	OutputStream output = null;//SALIDAS INPUT Y OUTPUT PARA TRANSFERENCIA DEL ARCHIVO
         	InputStream imput = null;
-        	//System.out.println("Indique el archivo a descargar?");
-        	//String remote = ask.next();
-        	//String remote = "C:\\Users\\isabe\\Documents\\texto.txt";
-        	//System.out.println("Indique el nombre del archivo");
-        	//String file = ask.next();
         	
-        	BufferedInputStream insert = null;
         	System.out.println("Indique el archivo a transferir?");
-        	
+        	String remote = ask.next();
+        	System.out.println("Indique el nombre del nuevo archivo archivo");
+        	String file = ask.next();
+
         	while(!isOk) {
-        		String remote = "C:\\Users\\isabe\\Documents\\texto.txt";
         		try {
-        			insert = new BufferedInputStream(new FileInputStream(remote));
-        			isOk = true;
-        		}catch(Exception e) {
-        			System.out.println(e.getMessage());
-            		System.out.println("Verifica el directorio");
-        		}
+        			File down = new File(pathFile + file);
+        			output = new BufferedOutputStream(new FileOutputStream(down));
+        			imput = clientFtp.retrieveFileStream(remote); // LLAMA AL ARCHIVO DEL SERVER
+        			System.out.println("Descarregant fitxer " + "'" + remote + "'");
+        			byte[] byt = new byte [4096];//arrays de bytes para reescritura del archivo
+                	int x = -1;
+                	
+                    while((x = imput.read(byt)) != -1) {
+                    	output.write(byt, 0, x);
+                    	System.out.println("Descargando");
+                    }
+        			
+        			isOk = clientFtp.completePendingCommand(); //RECIBE EL BOOLEAN CON EL VALOR DE LA OPERACIÓN.
+        			if (isOk) {
+        				System.out.println("Transferencia realitzada!!!");
+                    }
+        			
+        			output.close();
+        			imput.close();
+            	} catch(Exception e) {
+            		System.out.println(e.getMessage());
+                    System.out.println("La ruta no existeix, torna-la a introduir");
+                    isOk = false;
+            	}
         	}
         	
         	clientFtp.enterLocalPassiveMode();
-        	clientFtp.storeFile("nuevoArchivo.txt", insert);
-        	System.out.println("OKKKKKKKKKK");
-        	
-        	try {
-        		File descarga = new File(pathFile);
-            	BufferedOutputStream salida = new BufferedOutputStream(new FileOutputStream(descarga));
-            	boolean descar = clientFtp.retrieveFile("nuevoArchivo.txt", salida);
-            	if(descar) {
-            		System.out.println("OKKKKKKKKKK 2222222222222");
-            	}
-        	}catch(Exception e) {
-    			System.out.println(e.getMessage());
-        		System.out.println("Verifica el directorio");
-    		}
-        	
-        	/// SUGUE SIN DAR RESPUESTA
-        	
-        	/*try {
-        		//File down = new File(pathFile + file);
-        		File down = new File(remote);
-        		
-        		InputStream in = new FileInputStream(down);
-        		Boolean done = clientFtp.storeUniqueFile(in);
-        		in.close();
-        		if(done) {
-        			System.out.println("OKKKKKKKKKK");
-        		}
-        	} catch(Exception e) {
-        		System.out.println(e.getMessage());
-        		System.out.println("Verifica el directorio");
-        	}/*
-        		/////////
-        		//output = new BufferedOutputStream(new FileOutputStream(down));
-        		  
-            	//imput = clientFtp.retrieveFileStream(remote);
-            	
-            	/*byte[] byt = new byte [4096];
-            	int x = -1;
-            	//while((x = imput.read(byt)) != -1) {
-            		//output.write(byt, 0, x);
-            		//System.out.println("Descargando");
-            	} 	/* 
-        	} catch(Exception e) {
-        		System.out.println("Verifica el directorio");
-        	}
-        	/*
-        	boolean resp = clientFtp.completePendingCommand();
-        	if(resp) {
-        		System.out.println("Verifica el direcrotio");
-        	}*/
-        	
-        	/*clientFtp.enterLocalPassiveMode();
-        	isOk = clientFtp.retrieveFile("nuevo", output);
-        	if(isOk) {
-        		System.out.println("Verifica el direcrotio, ya he descargado");
-        	}*/
-        	
-        	insert.close();
      
         	menu(clientFtp);
   }
@@ -246,9 +204,9 @@ public class Ftp {
         
         	 String archivo = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";
         	 boolean isOk = false;
-        	// BufferedInputStream elimina = null;
         	 System.out.println("Indique el nombre del archivo");
          	 String file = ask.next();
+         	 
         	 try {
         		 isOk = ftpClient.deleteFile(archivo + file);
             	 if(isOk) {
@@ -258,7 +216,6 @@ public class Ftp {
          		System.out.println(e.getMessage());
          		System.out.println("Verifica el directorio");
          	}
-        	 
         	 
         	 menu(ftpClient);
     }
