@@ -172,7 +172,7 @@ public class Ftp {
         			output = new BufferedOutputStream(new FileOutputStream(down));
         			imput = clientFtp.retrieveFileStream(remote); // LLAMA AL ARCHIVO DEL SERVER
         			System.out.println("Descarregant fitxer " + "'" + remote + "'");
-        			byte[] byt = new byte [4096];//arrays de bytes para reescritura del archivo
+        			byte[] byt = new byte [4096];
                 	int x = -1;
                 	
                     while((x = imput.read(byt)) != -1) {
@@ -202,21 +202,26 @@ public class Ftp {
         
          public static void esborrarFitxerFTP(FTPClient ftpClient) throws IOException{
         
-        	 String archivo = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C";
+        	 //String archivo = "C:\\Users\\isabe\\Documents\\IOC\\M09\\UF3\\DAM_M09B0_EAC2_part2_Calzadilla_C\\NUEVO.txt";
         	 boolean isOk = false;
-        	 System.out.println("Indique el nombre del archivo");
-         	 String file = ask.next();
-         	 
+        	 System.out.println("Indique el archivo a ELIMINAR?");
+          	 String remote = ask.next();
+          	 BufferedInputStream buffer = null;
+          	 
         	 try {
-        		 isOk = ftpClient.deleteFile(archivo + file);
+        		 isOk = ftpClient.deleteFile(remote);
             	 if(isOk) {
-            		 System.out.println("Hasta la vista baby");
-            	 } 
+            		 System.out.println("Arxiu borrat!!!");
+            	 } else {
+            		 System.out.println("No hem pogut borrar el fitxer, ruta incorrecta");
+            	 }
+            	 buffer.close();
         	 } catch(Exception e) {
          		System.out.println(e.getMessage());
          		System.out.println("Verifica el directorio");
          	}
         	 
+        	 ftpClient.enterLocalPassiveMode();
         	 menu(ftpClient);
     }
     
